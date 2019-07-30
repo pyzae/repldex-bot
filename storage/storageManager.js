@@ -22,6 +22,7 @@ module.exports.write = function(data) {
   );
 };
 
-module.exports.read = function(name = "none", type) {
-  db.find({name, type});
+module.exports.read = function(name = "none") {
+  let entree = db.find({name});
+  return entree
 };

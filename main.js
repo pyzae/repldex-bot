@@ -7,16 +7,20 @@ client.on('ready', () => console.log("YES CHEF"))
 
 client.on('message', msg => {
   if(msg.channel.id == "605862116808720416"){
-    var stuff = msg.content.split('\n')
+    var breakdown = msg.content.split('\n')
 
     let entree = new storage.Entree(
-      stuff[0],
-      stuff[1],
+      breakdown[0],
+      breakdown[1],
       msg.author.tag,
-      stuff[2],
+      breakdown[2],
+      breakdown[3].split(',')
     );
     
     storage.write(entree);
+  }
+  if(msg.content.startsWith("?search")){
+    console.log(storage.read(msg.content.slice(8)))
   }
 })
 
