@@ -19,7 +19,6 @@
   "dependencies": {
     "discord.js": "^11.5.1",
     "dotenv": "^8.0.0",
-    "nedb": "^1.8.0",
-    "safe-eval": "^0.4.1"
+    "nedb": "^1.8.0"
   }
 }

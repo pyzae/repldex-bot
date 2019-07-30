@@ -2,7 +2,6 @@ const storage = require("./storage/storageManager");
 const discord = require('discord.js')
 const client = new discord.Client
 const config = require('./config')
-const safeEval = require('safe-eval')
 require('dotenv').config()
 
 client.on('ready', () => console.log("YES CHEF"))
@@ -20,10 +19,6 @@ client.on('message', msg => {
     );
     
     storage.write(entree);
-  }
-  if(config.devs.includes(msg.author.id) && msg.content.startsWith("?eval")){
-    let code = msg.content.slice(6)
-    safeEval(code, {msg, storage})
   }
   if(msg.content.startsWith("?search")){
     let docs = storage.read(msg.content.slice(8), (docs) =>{
