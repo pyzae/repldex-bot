@@ -6,7 +6,7 @@ let db = new Datastore({
 });
 
 module.exports.Entree = class Entree {
-  constructor(name, type, author, body, tags) {
+  constructor(name = null, type = null, author, body = null, tags = []) {
     this.name = name;
     this.type = type;
     this.author = author;
@@ -23,6 +23,8 @@ module.exports.write = function(data) {
 };
 
 module.exports.read = function(name = "none") {
-  let entree = db.find({name});
-  return entree
+  let entree = db.find({name}, (err, docs) => {
+    console.log(docs)
+    return docs
+  })
 };

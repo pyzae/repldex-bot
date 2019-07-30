@@ -20,7 +20,13 @@ client.on('message', msg => {
     storage.write(entree);
   }
   if(msg.content.startsWith("?search")){
-    console.log(storage.read(msg.content.slice(8)))
+    let docs = storage.read(msg.content.slice(8))
+    let embed = new discord.RichEmbed()
+    embed.setTitle(docs[0].name)
+    embed.setAuthor(docs[0].author)
+    embed.addField("body: ", docs[0].body)
+    embed.addField("type: ", docs[0].type)
+    embed.setFooter(docs[0]._id)
   }
 })
 
