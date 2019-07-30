@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/pyzae/repldex-bot#readme",
   "dependencies": {
-    "discord.js": "^11.5.1"
+    "discord.js": "^11.5.1",
+    "nedb": "^1.8.0"
   }
 }

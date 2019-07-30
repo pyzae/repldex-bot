@@ -1,1 +1,1 @@
-//write bot here
+var storage = require('./storage/storageManager')
