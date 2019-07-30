@@ -24,7 +24,10 @@ module.exports.write = function(data) {
 
 module.exports.read = function(name = "none", cb) {
   let entree = db.find({name}, (err, docs) => {
-    docs ? cb(docs) : cb("not found")
-    cb(docs)
+    if(docs.length == 0){
+      cb("not found")
+    } else{
+      cb(docs)
+    }
   })
 };
