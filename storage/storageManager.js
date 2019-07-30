@@ -24,6 +24,7 @@ module.exports.write = function(data) {
 
 module.exports.read = function(name = "none", cb) {
   let entree = db.find({name}, (err, docs) => {
+    err ? console.log(err) : console.log("succesfull query")
     if(docs.length == 0){
       cb("not found")
     } else{
