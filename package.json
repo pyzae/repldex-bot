@@ -1,0 +1,22 @@
+{
+  "name": "repldex-bot",
+  "version": "1.0.0",
+  "description": "a pokedex for repl-it lore",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pyzae/repldex-bot.git"
+  },
+  "author": "eaz",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pyzae/repldex-bot/issues"
+  },
+  "homepage": "https://github.com/pyzae/repldex-bot#readme",
+  "dependencies": {
+    "discord.js": "^11.5.1"
+  }
+}
