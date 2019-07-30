@@ -23,5 +23,5 @@ module.exports.write = function(data) {
 };
 
 module.exports.read = function(name = "none", type) {
-  db.find({ name: name, type: type });
+  db.find({name, type});
 };
