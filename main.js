@@ -12,7 +12,7 @@ client.on("message", msg => {
   if (msg.author.bot) return;
 
 
-  
+
 
   if (msg.channel.id == "605862116808720416") {
 
@@ -31,8 +31,6 @@ client.on("message", msg => {
     let docs = storage.read(msg.content.slice(8), docs => {
 
 
-      let embed = new discord.RichEmbed();
-
       if (docs != "not found") {
 
         for (let i = 0; i < docs.length; i++) {
@@ -43,6 +41,8 @@ client.on("message", msg => {
           embed.setTitle(docs[i].name);
 
           embed.setAuthor(docs[i].author);
+
+          embed.setColor(config.embedColor)
 
           embed.addField("Body : ", docs[i].body);
 
@@ -81,6 +81,8 @@ client.on("message", msg => {
           embed.setTitle(docs[i].name);
 
           embed.setAuthor(docs[i].author);
+
+          embed.setColor(config.embedColor)
 
           embed.addField("body: ", docs[i].body);
 
