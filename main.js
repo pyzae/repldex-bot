@@ -11,31 +11,9 @@ client.on("message", msg => {
   if (msg.author.bot) return;
 
   if (msg.channel.id == "605862116808720416") {
-    let parse = cheerio.load(msg.content);
-    let name = parse("title").text();
-    let type = parse("type").text();
-    let body = parse("description").text();
-    let tags = parse("tags").text();
-
-    if (name == "" && body == "") {
-      msg
-        .reply("not enough data")
-        .then(message => setTimeout(() => message.delete(), 5000));
-      if (msg.deletable) {
-        msg.delete();
-      }
-    } else {
-      let entree = new storage.Entree(
-        name,
-        type,
-        msg.author.tag,
-        body,
-        tags.split(",")
-      );
-
-      storage.write(entree);
-      msg.reply("your entree was added to the repldex");
-    }
+    let entree = parseEntree(msg)
+    storage.write(entree);
+    msg.reply("your entree was added to the repldex");
   }
   if (msg.content.startsWith("?search")) {
     let docs = storage.read(msg.content.slice(8), docs => {
@@ -54,5 +32,31 @@ client.on("message", msg => {
     });
   }
 });
+
+function parseEntree(msg){
+  let parse = cheerio.load(msg.content);
+  let name = parse("title").text();
+  let type = parse("type").text();
+  let body = parse("description").text();
+  let tags = parse("tags").text();
+
+  if (name == "" && body == "") {
+    msg
+      .reply("not enough data")
+      .then(message => setTimeout(() => message.delete(), 5000));
+    if (msg.deletable) {
+      msg.delete();
+    }
+  } else {
+    let entree = new storage.Entree(
+      name,
+      type,
+      msg.author.tag,
+      body,
+      tags.split(",")
+    );
+    return entree
+    }
+  }
 
 client.login(process.env.TOKEN);
