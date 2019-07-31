@@ -1,42 +1,90 @@
 const storage = require("./storage/storageManager");
-const discord = require('discord.js')
-const client = new discord.Client
-const config = require('./config')
-require('dotenv').config()
+const discord = require("discord.js");
+const client = new discord.Client();
+const config = require("./config");
+const cheerio = require("cheerio");
+require("dotenv").config();
 
-client.on('ready', () => console.log("YES CHEF"))
+client.on("ready", () => console.log("YES CHEF"));
 
-client.on('message', msg => {
-  if(msg.channel.id == "605862116808720416"){
-    var breakdown = msg.content.split('\n')
+client.on("message", msg => {
+  if (msg.author.bot) return;
 
-    let entree = new storage.Entree(
-      breakdown[0],
-      breakdown[1],
-      msg.author.tag,
-      breakdown[2],
-      breakdown[3].split(',')
-    );
-    
-    storage.write(entree);
+  if (msg.channel.id == "605862116808720416") {
+    let entree = parseEntree(msg)
+    if(entree != "bad"){
+      storage.write(entree);
+      msg.reply("your entree was added to the repldex");
+    }
   }
-  if(msg.content.startsWith("?search")){
-    let docs = storage.read(msg.content.slice(8), (docs) =>{
-      let embed = new discord.RichEmbed()
-      if(docs != "not found"){
-        embed.setTitle(docs[0].name)
-        embed.setAuthor(docs[0].author)
-        embed.addField("body: ", docs[0].body)
-        embed.addField("type: ", docs[0].type)
-        embed.addField("tags: ", docs[0].tags.join(", "))
-        embed.setFooter(docs[0]._id)
-        msg.channel.send(embed)
-      } else{
-        msg.channel.send("not found")
+  if (msg.content.startsWith("?search")) {
+    let docs = storage.read(msg.content.slice(8), docs => {
+      let embed = new discord.RichEmbed();
+      if (docs != "not found") {
+        for(let i = 0; i < docs.length; i++){
+          let embed = new discord.RichEmbed();
+          embed.setTitle(docs[0].name);
+          embed.setAuthor(docs[0].author);
+          embed.addField("body: ", docs[0].body);
+          embed.addField("type: ", docs[0].type);
+          embed.addField("tags: ", docs[0].tags.join(", "));
+          embed.setFooter(docs[0]._id);
+          msg.channel.send(embed);
+        }
+      } else {
+        msg.channel.send("not found");
       }
+    });
+  }
+  if (msg.content.startsWith("?advanced")){
+    try {
+      var query = JSON.parse(msg.content.slice(9))      
+    } catch (error) {
+      msg.reply("bad json")
+      return     
+    }
+    storage.advancedRead(query, docs => {
+      if (docs != "not found") {
+        for(let i = 0; i< docs.length; i++){
+          let embed = new discord.RichEmbed();
+          embed.setTitle(docs[i].name);
+          embed.setAuthor(docs[i].author);
+          embed.addField("body: ", docs[i].body);
+          embed.addField("type: ", docs[i].type);
+          embed.addField("tags: ", docs[i].tags.join(", "));
+          embed.setFooter(docs[i]._id);
+          msg.channel.send(embed);
+        }
+      } else msg.channel.send("not found")
     })
   }
-})
+});
 
+function parseEntree(msg){
+  let parse = cheerio.load(msg.content);
+  let name = parse("title").text();
+  let type = parse("type").text();
+  let body = parse("description").text();
+  let tags = parse("tags").text();
 
-client.login(process.env.TOKEN)
+  if (name == "" || body == "") {
+    msg
+      .reply("not enough data")
+      .then(message => setTimeout(() => message.delete(), 5000));
+    if (msg.deletable) {
+      msg.delete();
+    }
+    return "bad"
+  } else {
+    let entree = new storage.Entree(
+      name,
+      type,
+      msg.author.tag,
+      body,
+      tags.split(",")
+    );
+    return entree
+    }
+  }
+
+client.login(process.env.TOKEN);
