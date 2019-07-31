@@ -1,6 +1,7 @@
 const Datastore = require("nedb");
 const JsonStoreClient = require("async-jsonstore-io");
 const fs = require("fs")
+require('dotenv').config()
 
 let jsonstore = new JsonStoreClient(process.env.JSONSTORE);
 let db;
