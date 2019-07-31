@@ -18,7 +18,9 @@ client.on("message", msg => {
     let tags = parse("tags").text();
 
     if (name == "" && body == "") {
-      msg.reply("not enough data").then(message => setTimeout(() => message.delete(),5000))
+      msg
+        .reply("not enough data")
+        .then(message => setTimeout(() => message.delete(), 5000));
       if (msg.deletable) {
         msg.delete();
       }
@@ -32,7 +34,7 @@ client.on("message", msg => {
       );
 
       storage.write(entree);
-      msg.reply("your entree was added to the repldex")
+      msg.reply("your entree was added to the repldex");
     }
   }
   if (msg.content.startsWith("?search")) {
