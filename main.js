@@ -46,9 +46,9 @@ client.on("message", msg => {
 
           embed.addField("Body : ", docs[i].body);
 
-          embed.addField("Type : ", docs[i].type);
+          docs[i].type == "" ? embed.addField("Type : ", docs[i].type) : embed.addField("Type : ", "none")
 
-          embed.addField("Tags : ", docs[i].tags.join(", "));
+          docs[i].tags.length == 0 ?  embed.addField("Tags: ", docs[i].tags.join(", ")) : embed.addField("Tags : ", "none");
 
           embed.setFooter(docs[i]._id);
 
@@ -84,13 +84,13 @@ client.on("message", msg => {
 
           embed.setColor(config.embedColor)
 
-          embed.addField("body: ", docs[i].body);
+          embed.addField("Body : ", docs[i].body);
 
-          embed.addField("type: ", docs[i].type);
+          docs[i].type == "" ? embed.addField("Type : ", docs[i].type) : embed.addField("Type : ", "none")
 
-          embed.addField("tags: ", docs[i].tags.join(", "));
+          docs[i].tags.length == 0 ?  embed.addField("Tags: ", docs[i].tags.join(", ")) : embed.addField("Tags : ", "none");
 
-          embed.setFooter(docs[i]._id);
+          embed.setFooter(docs[i]._id)
 
           msg.channel.send(embed);
 
