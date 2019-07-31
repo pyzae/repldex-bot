@@ -21,7 +21,7 @@ client.on("message", msg => {
     let docs = storage.read(msg.content.slice(8), docs => {
       let embed = new discord.RichEmbed();
       if (docs != "not found") {
-        for(let i = 0; i< docs.length; i++){
+        for(let i = 0; i < docs.length; i++){
           let embed = new discord.RichEmbed();
           embed.setTitle(docs[0].name);
           embed.setAuthor(docs[0].author);
@@ -47,12 +47,12 @@ client.on("message", msg => {
       if (docs != "not found") {
         for(let i = 0; i< docs.length; i++){
           let embed = new discord.RichEmbed();
-          embed.setTitle(docs[0].name);
-          embed.setAuthor(docs[0].author);
-          embed.addField("body: ", docs[0].body);
-          embed.addField("type: ", docs[0].type);
-          embed.addField("tags: ", docs[0].tags.join(", "));
-          embed.setFooter(docs[0]._id);
+          embed.setTitle(docs[i].name);
+          embed.setAuthor(docs[i].author);
+          embed.addField("body: ", docs[i].body);
+          embed.addField("type: ", docs[i].type);
+          embed.addField("tags: ", docs[i].tags.join(", "));
+          embed.setFooter(docs[i]._id);
           msg.channel.send(embed);
         }
       } else msg.channel.send("not found")
