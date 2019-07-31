@@ -1,9 +1,9 @@
+require("dotenv").config();
 const storage = require("./storage/storageManager");
 const discord = require("discord.js");
 const client = new discord.Client();
 const config = require("./config");
 const cheerio = require("cheerio");
-require("dotenv").config();
 
 client.on("ready", () => console.log("YES CHEF"));
 
