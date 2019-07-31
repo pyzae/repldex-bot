@@ -8,66 +8,51 @@ const cheerio = require("cheerio");
 client.on("ready", () => console.log("YES CHEF"));
 
 client.on("message", msg => {
-
   if (msg.author.bot) return;
 
-
-
-
   if (msg.channel.id == "605862116808720416") {
-
     let entree = parseEntree(msg);
 
-
     if (entree != "bad") {
-
       storage.write(entree);
 
       msg.reply("your entree was added to the repldex");
-
     }
   }
   if (msg.content.startsWith("?search")) {
     let docs = storage.read(msg.content.slice(8), docs => {
-
-
       if (docs != "not found") {
-
         for (let i = 0; i < docs.length; i++) {
-
           let embed = new discord.RichEmbed();
-
 
           embed.setTitle(docs[i].name);
 
           embed.setAuthor(docs[i].author);
 
-          embed.setColor(config.embedColor)
+          embed.setColor(config.embedColor);
 
           embed.addField("Body : ", docs[i].body);
 
-          docs[i].type == "" ? embed.addField("Type : ", docs[i].type) : embed.addField("Type : ", "none")
+          docs[i].type == ""
+            ? embed.addField("Type : ", "none")
+            : embed.addField("Type : ", docs[i].type);
 
-          docs[i].tags.length == 0 ?  embed.addField("Tags: ", docs[i].tags.join(", ")) : embed.addField("Tags : ", "none");
+          docs[i].tags.length == 0
+            ? embed.addField("Tags : ", "none")
+            : embed.addField("Tags: ", docs[i].tags.join(", "));
 
           embed.setFooter(docs[i]._id);
 
           msg.channel.send(embed);
-
         }
       } else {
-
         msg.channel.send("not found");
-
       }
     });
   }
   if (msg.content.startsWith("?advanced")) {
-
     try {
-
       var query = JSON.parse(msg.content.slice(9));
-
     } catch (error) {
       msg.reply("bad json");
 
@@ -82,22 +67,23 @@ client.on("message", msg => {
 
           embed.setAuthor(docs[i].author);
 
-          embed.setColor(config.embedColor)
+          embed.setColor(config.embedColor);
 
           embed.addField("Body : ", docs[i].body);
 
-          docs[i].type == "" ? embed.addField("Type : ", docs[i].type) : embed.addField("Type : ", "none")
+          docs[i].type == ""
+            ? embed.addField("Type : ", "none")
+            : embed.addField("Type : ", docs[i].type);
 
-          docs[i].tags.length == 0 ?  embed.addField("Tags: ", docs[i].tags.join(", ")) : embed.addField("Tags : ", "none");
+          docs[i].tags.length == 0
+            ? embed.addField("Tags : ", "none")
+            : embed.addField("Tags: ", docs[i].tags.join(", "));
 
-          embed.setFooter(docs[i]._id)
+          embed.setFooter(docs[i]._id);
 
           msg.channel.send(embed);
-
         }
-
       } else msg.channel.send("not found");
-
     });
   }
 });
@@ -105,26 +91,21 @@ client.on("message", msg => {
 function parseEntree(msg) {
   let parse = cheerio.load(msg.content);
 
-
   let name = parse("title")
     .text()
     .trim();
-
 
   let type = parse("type")
     .text()
     .trim();
 
-
   let body = parse("description")
     .text()
     .trim();
 
-
   let tags = parse("tags")
     .text()
     .trim();
-
 
   if (name == "" || body == "") {
     msg
@@ -132,16 +113,11 @@ function parseEntree(msg) {
       .then(message => setTimeout(() => message.delete(), 5000));
 
     if (msg.deletable) {
-
       msg.delete();
-
     }
 
     return "bad";
-
-
   } else {
-
     let entree = new storage.Entree(
       name,
       type,
@@ -150,9 +126,7 @@ function parseEntree(msg) {
       tags.split(",")
     );
 
-
     return entree;
-
   }
 }
 
