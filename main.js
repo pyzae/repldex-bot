@@ -12,24 +12,51 @@ client.on("message", msg => {
 
   if (msg.channel.id == "605862116808720416") {
     let entree = parseEntree(msg)
-    storage.write(entree);
-    msg.reply("your entree was added to the repldex");
+    if(entree != "bad"){
+      storage.write(entree);
+      msg.reply("your entree was added to the repldex");
+    }
   }
   if (msg.content.startsWith("?search")) {
     let docs = storage.read(msg.content.slice(8), docs => {
       let embed = new discord.RichEmbed();
       if (docs != "not found") {
-        embed.setTitle(docs[0].name);
-        embed.setAuthor(docs[0].author);
-        embed.addField("body: ", docs[0].body);
-        embed.addField("type: ", docs[0].type);
-        embed.addField("tags: ", docs[0].tags.join(", "));
-        embed.setFooter(docs[0]._id);
-        msg.channel.send(embed);
+        for(let i = 0; i< docs.length; i++){
+          let embed = new discord.RichEmbed();
+          embed.setTitle(docs[0].name);
+          embed.setAuthor(docs[0].author);
+          embed.addField("body: ", docs[0].body);
+          embed.addField("type: ", docs[0].type);
+          embed.addField("tags: ", docs[0].tags.join(", "));
+          embed.setFooter(docs[0]._id);
+          msg.channel.send(embed);
+        }
       } else {
         msg.channel.send("not found");
       }
     });
+  }
+  if (msg.content.startsWith("?advanced")){
+    try {
+      var query = JSON.parse(msg.content.slice(9))      
+    } catch (error) {
+      msg.reply("bad json")
+      return     
+    }
+    storage.advancedRead(query, docs => {
+      if (docs != "not found") {
+        for(let i = 0; i< docs.length; i++){
+          let embed = new discord.RichEmbed();
+          embed.setTitle(docs[0].name);
+          embed.setAuthor(docs[0].author);
+          embed.addField("body: ", docs[0].body);
+          embed.addField("type: ", docs[0].type);
+          embed.addField("tags: ", docs[0].tags.join(", "));
+          embed.setFooter(docs[0]._id);
+          msg.channel.send(embed);
+        }
+      } else msg.channel.send("not found")
+    })
   }
 });
 
@@ -40,13 +67,14 @@ function parseEntree(msg){
   let body = parse("description").text();
   let tags = parse("tags").text();
 
-  if (name == "" && body == "") {
+  if (name == "" || body == "") {
     msg
       .reply("not enough data")
       .then(message => setTimeout(() => message.delete(), 5000));
     if (msg.deletable) {
       msg.delete();
     }
+    return "bad"
   } else {
     let entree = new storage.Entree(
       name,

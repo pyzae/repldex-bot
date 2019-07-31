@@ -23,12 +23,22 @@ module.exports.write = function(data) {
 };
 
 module.exports.read = function(name = "none", cb) {
-  let entree = db.find({name}, (err, docs) => {
-    err ? console.log(err) : console.log("succesfull query")
-    if(docs.length == 0){
-      cb("not found")
-    } else{
-      cb(docs)
+  let entree = db.find({ name }, (err, docs) => {
+    err ? console.log(err) : console.log("succesfull query");
+    if (docs.length == 0) {
+      cb("not found");
+    } else {
+      cb(docs);
     }
-  })
+  });
+};
+
+module.exports.advancedRead = function(query, cb) {
+  db.find(query, (err, docs) => {
+    err ? console.log(err) : console.log("successull advanced query");
+    if(docs.length == 0){
+      console.log("not found")
+      cb("not found")
+    } else cb(docs)
+  });
 };
