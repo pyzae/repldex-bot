@@ -43,7 +43,7 @@ async function saveDatabase() {
   });
 }
 
-module.exports.Entree = class Entree {
+module.exports.Entry = class Entry {
   constructor(name = null, type = null, author, body = null, tags = []) {
     this.name = name;
 
@@ -57,7 +57,7 @@ module.exports.Entree = class Entree {
   }
 };
 
-//data should be of type Entree
+//data should be of type Entry
 module.exports.write = function(data) {
   db.insert(data, err => {
     err ? console.log("err : " + err) : console.log("succesful write")

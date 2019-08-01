@@ -11,12 +11,12 @@ client.on("message", msg => {
   if (msg.author.bot) return;
 
   if (msg.channel.id == "605862116808720416") {
-    let entree = parseEntree(msg);
+    let entry = parseEntry(msg);
 
-    if (entree != "bad") {
-      storage.write(entree);
+    if (entry != "bad") {
+      storage.write(entry);
 
-      msg.reply("your entree was added to the repldex");
+      msg.reply("your entry was added to the repldex");
     }
   }
   if (msg.content.startsWith("?search")) {
@@ -88,7 +88,7 @@ client.on("message", msg => {
   }
 });
 
-function parseEntree(msg) {
+function parseEntry(msg) {
   let parse = cheerio.load(msg.content);
 
   let name = parse("title")
@@ -118,7 +118,7 @@ function parseEntree(msg) {
 
     return "bad";
   } else {
-    let entree = new storage.Entree(
+    let entry = new storage.Entry(
       name,
       type,
       msg.author.tag,
@@ -126,7 +126,7 @@ function parseEntree(msg) {
       tags.split(",")
     );
 
-    return entree;
+    return entry;
   }
 }
 
