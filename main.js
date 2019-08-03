@@ -86,6 +86,21 @@ client.on("message", msg => {
       } else msg.channel.send("not found");
     });
   }
+
+  if (msg.content.startsWith("?wipe")) {
+    let argValues = ["online", ""];
+    let arg = msg.slice(6);
+
+    if (!config.dev.includes(msg.author.id)) {
+      console.log(msg.author.tag + " tried to wipe the database"); 
+    }
+    else if (!argValues.includes(arg)) {
+      msg.channel.send("Usage ?wipe [online]");
+    }
+    else {
+      storage.wipeDatabase(arg === "online");
+    }
+  }
 });
 
 function parseEntry(msg) {
