@@ -107,4 +107,13 @@ module.exports.advancedRead = function(query, cb) {
   });
 };
 
+module.exports.wipeDatabase = function(online) {
+  wipeDatabaseFile().then(() => {
+    if(online) wipeDatabaseOnline().then(() => {
+      loadDatabase.catch(console.error);
+    }).catch(console.error);
+    else loadDatabase.catch(console.error);
+  }).catch(console.error);
+}
+
 loadDatabase().catch(console.error);
