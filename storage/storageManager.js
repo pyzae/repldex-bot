@@ -43,6 +43,20 @@ async function saveDatabase() {
   });
 }
 
+async function wipeDatabaseFile() {
+  console.log("Deleting database file");
+  fs.unlink(__dirname + "/repldex.db", (err) => {
+    if (err) throw err;
+    console.log("Done")
+  })  
+}
+
+async function wipeDatabaseOnline() {
+  console.log("Deleting jsonstore database");
+  await jsonstore.delete('database');
+  console.log("Done");
+}
+
 module.exports.Entry = class Entry {
   constructor(name = null, type = null, author, body = null, tags = []) {
     this.name = name;
