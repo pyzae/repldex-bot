@@ -107,13 +107,13 @@ module.exports.advancedRead = function(query, cb) {
   });
 };
 
-module.exports.wipeDatabase = function(online) {
+module.exports.wipeDatabase = function(online, cb) {
   wipeDatabaseFile().then(() => {
     if(online) wipeDatabaseOnline().then(() => {
-      loadDatabase.catch(console.error);
-    }).catch(console.error);
-    else loadDatabase.catch(console.error);
-  }).catch(console.error);
+      loadDatabase().then(cb).catch(cb);
+    }).catch(cb);
+    else loadDatabase().then(cb).catch(cb);
+  }).catch(cb);
 }
 
 loadDatabase().catch(console.error);
