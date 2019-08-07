@@ -1,7 +1,7 @@
 const Datastore = require("nedb");
 const JsonStoreClient = require("async-jsonstore-io");
 const fs = require("fs")
-require('dotenv').config()
+const config = require("../config")
 
 let jsonstore = new JsonStoreClient(process.env.JSONSTORE);
 let db;
@@ -11,22 +11,22 @@ async function loadDatabase() {
 
   // Do not crash if there is nothing in jsonstore
   try {
-    data = await jsonstore.get("database");
+    data = await jsonstore.get(config.jsonstoreKey);
   }
   catch (err) {
     console.error(err);
     db = new Datastore({
-      filename: __dirname + "/repldex.db",
+      filename: config.databaseFile,
       autoload: true
     });
     throw "Nothing on jsonstore, don't worry I handled it"
   }
 
-  fs.writeFile(__dirname + "/repldex.db", data.data, (err) => {
+  fs.writeFile(config.databaseFile, data.data, (err) => {
     if (err) throw err;
 
     db = new Datastore({
-      filename: __dirname + "/repldex.db",
+      filename: config.databaseFile,
       autoload: true
     });
     console.log("Database loaded");
@@ -34,13 +34,27 @@ async function loadDatabase() {
 }
 
 async function saveDatabase() {
-  fs.readFile(__dirname + "/repldex.db", {encoding: 'utf8'}, (err, data) => {
+  fs.readFile(config.databaseFile, {encoding: 'utf8'}, (err, data) => {
     if (err) throw err;
 
-    jsonstore.send('database', {data}).then((data) => {
+    jsonstore.send(config.jsonstoreKey, {data}).then((data) => {
       console.log("Database sent");
     }).catch(console.error);
   });
+}
+
+async function wipeDatabaseFile() {
+  console.log("Deleting database file");
+  fs.unlink(config.databaseFile, (err) => {
+    if (err) throw err;
+    console.log("Done")
+  })  
+}
+
+async function wipeDatabaseOnline() {
+  console.log("Deleting jsonstore database");
+  await jsonstore.delete('database');
+  console.log("Done");
 }
 
 module.exports.Entry = class Entry {
@@ -92,5 +106,14 @@ module.exports.advancedRead = function(query, cb) {
     } else cb(docs)
   });
 };
+
+module.exports.wipeDatabase = function(online, cb) {
+  wipeDatabaseFile().then(() => {
+    if(online) wipeDatabaseOnline().then(() => {
+      loadDatabase().then(cb).catch(cb);
+    }).catch(cb);
+    else loadDatabase().then(cb).catch(cb);
+  }).catch(cb);
+}
 
 loadDatabase().catch(console.error);
