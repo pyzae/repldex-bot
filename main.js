@@ -7,24 +7,24 @@ const entryBuilder = require("./entryBuilder");
 
 client.on("ready", () => console.log("YES CHEF")); //what is this btw
 
-var onGoingEntrys = new Map();
+var onGoingEntries = new Map();
 
 client.on("message", msg => {
   if (msg.author.bot) return;
 
-  if (onGoingEntrys.has(msg.author.id)) {
-    infoGather(onGoingentrys.get(msg.author.id), msg.content);
+  if (onGoingEntries.has(msg.author.id)) {
+    infoGather(onGoingEntries.get(msg.author.id), msg.content);
   }
 
   if (msg.content === "?writeentry") {
     msg.channel.send(
       "Information gathering has begun, please check your direct messages"
     );
-    onGoingEntrys.set(
+    onGoingEntries.set(
       msg.author.id,
       new entryBuilder(msg.author.id, msg.author)
     );
-    onGoingEntrys
+    onGoingEntries
       .get(msg.author.id)
       .author.send("Please provide a name/title for your entry");
   }
@@ -120,17 +120,18 @@ function infoGather(entry, val) {
     case 3: {
       entry.content.description = val;
       entry.author.send(
-        "TThank you for completing your entry, it will be available to users of the repldex once approved by the mods"
+        "Thank you for completing your entry, it will be available to users of the repldex once approved by the mods"
       );
       storage.write(
         new storage.Entry(
-          entry.content.name,
-          entry.content.type,
+          entry.content.name.trim(),
+          entry.content.type.trim(),
           client.users.get(entry.authorID).tag,
-          entry.content.description,
-          entry.content.tags
+          entry.content.description.trim(),
+          entry.content.tags.map(v => v.trim())
         )
       );
+      onGoingEntries.delete(entry.authorID);
       break;
     }
   }
