@@ -1,9 +1,13 @@
 require("dotenv").config();
-const storage = require("./storage/storageManager");
+
 const discord = require("discord.js");
-const client = new discord.Client();
-const config = require("./config");
+const akairo = require("discord-akairo");
 const cheerio = require("cheerio");
+
+const storage = require("./storage/storageManager");
+const config = require("./config");
+
+const client = new akairo.AkairoClient();
 
 client.on("ready", () => console.log("YES CHEF"));
 
