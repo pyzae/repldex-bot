@@ -6,5 +6,7 @@ module.exports = {
         "449654439490355231",
         "602699878753107973"
     ],
-    embedColor : "#66CD00"
+    embedColor : "#66CD00",
+    databaseFile : __dirname + "/storage/repldex.db",
+    jsonstoreKey : "database"
 }
