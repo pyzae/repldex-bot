@@ -1,12 +1,15 @@
-const Datastore = require("nedb");
+const MongoClient = new require("mongodb").MongoClient;
 const JsonStoreClient = require("async-jsonstore-io");
 const fs = require("fs")
 const config = require("../config")
 
 let jsonstore = new JsonStoreClient(process.env.JSONSTORE);
 let db;
+const dbName = 'repldex';
+const collectionName = 'entries';
 
 async function loadDatabase() {
+	/*
   let data;
 
   // Do not crash if there is nothing in jsonstore
@@ -31,8 +34,17 @@ async function loadDatabase() {
     });
     console.log("Database loaded");
   });
+	*/
+	MongoClient.connect(process.env.MONGO_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+  }, function(err, client) {
+		db = client.db(dbName).collection(collectionName)
+	})
+	
 }
 
+/*
 async function saveDatabase() {
   fs.readFile(config.databaseFile, {encoding: 'utf8'}, (err, data) => {
     if (err) throw err;
@@ -41,7 +53,7 @@ async function saveDatabase() {
       console.log("Database sent");
     }).catch(console.error);
   });
-}
+}*/
 
 async function wipeDatabaseFile() {
   console.log("Deleting database file");
@@ -73,37 +85,44 @@ module.exports.Entry = class Entry {
 
 //data should be of type Entry
 module.exports.write = function(data) {
-  db.insert(data, err => {
-    err ? console.log("err : " + err) : console.log("succesful write")
-    saveDatabase().catch(console.error);
+  db.insertOne(data, err => {
+    err ? console.log("err : " + err) : console.log("succesful write");
   });
 };
 
 module.exports.read = function(name = "none", cb) {
   db.find({ name }, (err, docs) => {
-    err ? console.log(err) : console.log("succesfull query");
-    if (docs.length == 0) {
+		docs.toArray(function(array_err, docs) {
+			err ? console.log(err) : console.log("succesfull query");
+			array_err ? console.log(array_err) : console.log("^")
+			if (docs.length == 0) {
 
-      cb("not found");
+				cb("not found");
 
-    } else {
-      
-      cb(docs);
+			} else {
+				
+				cb(docs);
 
-    }
+			}
+		});
   });
 };
 
 module.exports.advancedRead = function(query, cb) {
   db.find(query, (err, docs) => {
+		docs.toArray(function(array_err, docs) {
+			err ? console.log(err) : console.log("succesfull query");
+			array_err ? console.log(array_err) : console.log("^")
+			if (docs.length == 0) {
 
-    err ? cb("err") : console.log("successull advanced query");
+				cb("not found");
 
-    if(docs.length == 0){
+			} else {
+				
+				cb(docs);
 
-      cb("not found")
-
-    } else cb(docs)
+			}
+		});
   });
 };
 

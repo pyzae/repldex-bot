@@ -17,10 +17,11 @@
   },
   "homepage": "https://github.com/pyzae/repldex-bot#readme",
   "dependencies": {
+    "async-jsonstore-io": "^3.0.1",
     "cheerio": "^1.0.0-rc.3",
     "discord.js": "^11.5.1",
     "dotenv": "^8.0.0",
-    "nedb": "^1.8.0",
-    "async-jsonstore-io": "^3.0.1"
+    "mongodb": "^3.3.4",
+    "nedb": "^1.8.0"
   }
 }
