@@ -13,7 +13,9 @@ client.on("message", msg => {
   if (msg.author.bot) return;
 
   if (onGoingEntries.has(msg.author.id)) {
-    infoGather(onGoingEntries.get(msg.author.id), msg.content);
+    if (msg.guild === null)
+      infoGather(onGoingEntries.get(msg.author.id), msg.content);
+    return;
   }
 
   if (msg.content === "?writeentry") {
