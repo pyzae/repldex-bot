@@ -3,22 +3,34 @@ const storage = require("./storage/storageManager");
 const discord = require("discord.js");
 const client = new discord.Client();
 const config = require("./config");
-const cheerio = require("cheerio");
+const entryBuilder = require("./entryBuilder");
 
-client.on("ready", () => console.log("YES CHEF"));
+client.on("ready", () => console.log("YES CHEF")); //what is this btw
+
+var onGoingEntries = new Map();
 
 client.on("message", msg => {
   if (msg.author.bot) return;
 
-  if (msg.channel.id == "605862116808720416") {
-    let entry = parseEntry(msg);
-
-    if (entry != "bad") {
-      storage.write(entry);
-
-      msg.reply("your entry was added to the repldex");
-    }
+  if (onGoingEntries.has(msg.author.id)) {
+    if (msg.guild === null)
+      infoGather(onGoingEntries.get(msg.author.id), msg.content);
+    return;
   }
+
+  if (msg.content === "?writeentry") {
+    msg.channel.send(
+      "Information gathering has begun, please check your direct messages"
+    );
+    onGoingEntries.set(
+      msg.author.id,
+      new entryBuilder(msg.author.id, msg.author)
+    );
+    onGoingEntries
+      .get(msg.author.id)
+      .author.send("Please provide a name/title for your entry");
+  }
+
   if (msg.content.startsWith("?search")) {
     let docs = storage.read(msg.content.slice(8), docs => {
       if (docs != "not found") {
@@ -88,46 +100,44 @@ client.on("message", msg => {
   }
 });
 
-function parseEntry(msg) {
-  let parse = cheerio.load(msg.content);
-
-  let name = parse("title")
-    .text()
-    .trim();
-
-  let type = parse("type")
-    .text()
-    .trim();
-
-  let body = parse("description")
-    .text()
-    .trim();
-
-  let tags = parse("tags")
-    .text()
-    .trim();
-
-  if (name == "" || body == "") {
-    msg
-      .reply("not enough data")
-      .then(message => setTimeout(() => message.delete(), 5000));
-
-    if (msg.deletable) {
-      msg.delete();
+function infoGather(entry, val) {
+  switch (entry.slot) {
+    case 0: {
+      entry.content.name = val;
+      entry.author.send("Please send the type of your entry");
+      break;
     }
-
-    return "bad";
-  } else {
-    let entry = new storage.Entry(
-      name,
-      type,
-      msg.author.tag,
-      body,
-      tags.split(",")
-    );
-
-    return entry;
+    case 1: {
+      entry.content.type = val;
+      entry.author.send(
+        "Please send the tags for your entry seperated by commas"
+      );
+      break;
+    }
+    case 2: {
+      entry.content.tags = val.split(",");
+      entry.author.send("Please write a description for your entry");
+      break;
+    }
+    case 3: {
+      entry.content.description = val;
+      entry.author.send(
+        "Thank you for completing your entry, it will be available to users of the repldex once approved by the mods"
+      );
+      storage.write(
+        new storage.Entry(
+          entry.content.name.trim(),
+          entry.content.type.trim(),
+          client.users.get(entry.authorID).tag,
+          entry.content.description.trim(),
+          entry.content.tags.map(v => v.trim())
+        )
+      );
+      onGoingEntries.delete(entry.authorID);
+      break;
+    }
   }
+  entry.slot++;
 }
 
 client.login(process.env.TOKEN);
