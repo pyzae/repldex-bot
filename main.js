@@ -3,40 +3,31 @@ const storage = require("./storage/storageManager");
 const discord = require("discord.js");
 const client = new discord.Client();
 const config = require("./config");
-const entreeBuilder = require("./entreeBuilder");
+const entryBuilder = require("./entryBuilder");
 
-client.on("ready", () => console.log("YES CHEF"));
+client.on("ready", () => console.log("YES CHEF")); //what is this btw
 
-var onGoingEntrees = new Map();
+var onGoingEntrys = new Map();
 
 client.on("message", msg => {
   if (msg.author.bot) return;
 
-  if (onGoingEntrees.has(msg.author.id)) {
-    infoGather(onGoingEntrees.get(msg.author.id), msg.content);
+  if (onGoingEntrys.has(msg.author.id)) {
+    infoGather(onGoingentrys.get(msg.author.id), msg.content);
   }
 
-  if (msg.content === "?writeEntree") {
+  if (msg.content === "?writeentry") {
     msg.channel.send(
       "Information gathering has begun, please check your direct messages"
     );
-    onGoingEntrees.set(
+    onGoingEntrys.set(
       msg.author.id,
-      new entreeBuilder(msg.author.id, msg.author)
+      new entryBuilder(msg.author.id, msg.author)
     );
-    onGoingEntrees
+    onGoingEntrys
       .get(msg.author.id)
-      .author.send("Please provide a name/title for your entree");
+      .author.send("Please provide a name/title for your entry");
   }
-  // if (msg.channel.id == "605862116808720416") {
-  //   let entry = parseEntry(msg);
-
-  //   if (entry != "bad") {
-  //     storage.write(entry);
-
-  //     msg.reply("your entry was added to the repldex");
-  //   }
-  // }
 
   if (msg.content.startsWith("?search")) {
     let docs = storage.read(msg.content.slice(8), docs => {
@@ -107,85 +98,43 @@ client.on("message", msg => {
   }
 });
 
-function infoGather(entree, val) {
-  switch (entree.slot) {
+function infoGather(entry, val) {
+  switch (entry.slot) {
     case 0: {
-      entree.content.name = val;
-      entree.author.send("Please send the type of your entree");
+      entry.content.name = val;
+      entry.author.send("Please send the type of your entry");
       break;
     }
     case 1: {
-      entree.content.type = val;
-      entree.author.send(
-        "Please send the tags for your entree seperated by commas"
+      entry.content.type = val;
+      entry.author.send(
+        "Please send the tags for your entry seperated by commas"
       );
       break;
     }
     case 2: {
-      entree.content.tags = val.split(",");
-      entree.author.send("Please write a description for your entree");
+      entry.content.tags = val.split(",");
+      entry.author.send("Please write a description for your entry");
       break;
     }
     case 3: {
-      entree.content.description = val;
-      entree.author.send(
-        "TThank you for completing your entree, it will be available to users of the repldex once approved by the mods"
+      entry.content.description = val;
+      entry.author.send(
+        "TThank you for completing your entry, it will be available to users of the repldex once approved by the mods"
       );
       storage.write(
         new storage.Entry(
-          entree.content.name,
-          entree.content.type,
-          client.users.get(entree.authorID).tag,
-          entree.content.description,
-          entree.content.tags
+          entry.content.name,
+          entry.content.type,
+          client.users.get(entry.authorID).tag,
+          entry.content.description,
+          entry.content.tags
         )
       );
       break;
     }
   }
-  entree.slot++;
+  entry.slot++;
 }
-
-// function parseEntry(msg) {
-//   let parse = cheerio.load(msg.content);
-
-//   let name = parse("title")
-//     .text()
-//     .trim();
-
-//   let type = parse("type")
-//     .text()
-//     .trim();
-
-//   let body = parse("description")
-//     .text()
-//     .trim();
-
-//   let tags = parse("tags")
-//     .text()
-//     .trim();
-
-//   if (name == "" || body == "") {
-//     msg
-//       .reply("not enough data")
-//       .then(message => setTimeout(() => message.delete(), 5000));
-
-//     if (msg.deletable) {
-//       msg.delete();
-//     }
-
-//     return "bad";
-//   } else {
-//     let entry = new storage.Entry(
-//       name,
-//       type,
-//       msg.author.tag,
-//       body,
-//       tags.split(",")
-//     );
-
-//     return entry;
-//   }
-// }
 
 client.login(process.env.TOKEN);
