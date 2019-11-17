@@ -3,7 +3,6 @@ const storage = require("./storage/storageManager");
 const discord = require("discord.js");
 const client = new discord.Client();
 const config = require("./config");
-const entryBuilder = require("./entryBuilder");
 
 client.on("ready", () => console.log("YES CHEF")); //what is this btw
 
@@ -13,13 +12,13 @@ client.on("message", msg => {
   if (msg.author.bot) return;
 
   if (msg.content == "?cancel") {
-    onGoingEntries.delete(msg.author.id);
+    onGoingEntries.delete(msg.author.tag);
     msg.channel.send("entry cancelled");
   }
 
-  if (onGoingEntries.has(msg.author.id)) {
+  if (onGoingEntries.has(msg.author.tag)) {
     if (msg.guild === null)
-      infoGather(onGoingEntries.get(msg.author.id), msg.content);
+      infoGather(onGoingEntries.get(msg.author.tag), msg.content);
     return;
   }
 
@@ -28,12 +27,11 @@ client.on("message", msg => {
       "Information gathering has begun, please check your direct messages (note : you may cancel this entry at any time with ?cancel)"
     );
     onGoingEntries.set(
-      msg.author.id,
-      new entryBuilder(msg.author.id, msg.author)
+      msg.author.tag,
+      new storage.Entry(null,null, msg.author.tag, null, null)
     );
-    onGoingEntries
-      .get(msg.author.id)
-      .author.send("Please provide a name/title for your entry (note : you may cancel this entry at any time with ?cancel)");
+    onGoingEntries.get(msg.author.tag)
+    client.users.get(msg.author.id).send("Please provide a name/title for your entry (note : you may cancel this entry at any time with ?cancel)");
   }
 
   if (msg.content.startsWith("?search")) {
@@ -121,42 +119,42 @@ client.on("message", msg => {
   }
 });
 
-function infoGather(entry, val) {
+function infoGather(entry, val, channel) {
   switch (entry.slot) {
     case 0: {
-      entry.content.name = val;
-      entry.author.send(
+      entry.name = val;
+      channel.send(
         "Please send the type of your entry"
       );
       break;
     }
     case 1: {
-      entry.content.type = val;
-      entry.author.send(
+      entry.type = val;
+      channel.send(
         "Please send the tags for your entry seperated by commas"
       );
       break;
     }
     case 2: {
-      entry.content.tags = val.split(",");
-      entry.author.send("Please write a description for your entry");
+      entry.tags = val.split(",");
+      channel.send("Please write a description for your entry");
       break;
     }
     case 3: {
-      entry.content.description = val;
-      entry.author.send(
+      entry.description = val;
+      channel.send(
         "Thank you for completing your entry, it will be available to users of the repldex once approved by the mods"
       );
       storage.write(
         new storage.Entry(
-          entry.content.name.trim(),
-          entry.content.type.trim(),
-          client.users.get(entry.authorID).tag,
-          entry.content.description.trim(),
-          entry.content.tags.map(v => v.trim())
+          entry.name.trim(),
+          entry.type.trim(),
+          entry.tag,
+          entry.description.trim(),
+          entry.tags.map(v => v.trim())
         )
       );
-      onGoingEntries.delete(entry.authorID);
+      onGoingEntries.delete(entry.author);
       break;
     }
   }
