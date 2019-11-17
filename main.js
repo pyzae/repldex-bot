@@ -12,6 +12,11 @@ var onGoingEntries = new Map();
 client.on("message", msg => {
   if (msg.author.bot) return;
 
+  if (msg.content == "?cancel") {
+    onGoingEntries.delete(msg.author.id);
+    msg.channel.send("entry cancelled");
+  }
+
   if (onGoingEntries.has(msg.author.id)) {
     if (msg.guild === null)
       infoGather(onGoingEntries.get(msg.author.id), msg.content);
@@ -20,7 +25,7 @@ client.on("message", msg => {
 
   if (msg.content === "?writeentry") {
     msg.channel.send(
-      "Information gathering has begun, please check your direct messages"
+      "Information gathering has begun, please check your direct messages (note : you may cancel this entry at any time with ?cancel)"
     );
     onGoingEntries.set(
       msg.author.id,
@@ -28,7 +33,7 @@ client.on("message", msg => {
     );
     onGoingEntries
       .get(msg.author.id)
-      .author.send("Please provide a name/title for your entry");
+      .author.send("Please provide a name/title for your entry (note : you may cancel this entry at any time with ?cancel)");
   }
 
   if (msg.content.startsWith("?search")) {
@@ -104,13 +109,11 @@ client.on("message", msg => {
     let arg = msg.content.slice(6);
 
     if (!config.devs.includes(msg.author.id)) {
-      console.log(msg.author.tag + " tried to wipe the database"); 
-    }
-    else if (!argValues.includes(arg)) {
+      console.log(msg.author.tag + " tried to wipe the database");
+    } else if (!argValues.includes(arg)) {
       msg.channel.send("Usage ?wipe [online]");
-    }
-    else {
-      storage.wipeDatabase(arg === "online", (err) => {
+    } else {
+      storage.wipeDatabase(arg === "online", err => {
         if (err) console.error(err);
         else msg.channel.send("Done");
       });
@@ -122,7 +125,9 @@ function infoGather(entry, val) {
   switch (entry.slot) {
     case 0: {
       entry.content.name = val;
-      entry.author.send("Please send the type of your entry");
+      entry.author.send(
+        "Please send the type of your entry"
+      );
       break;
     }
     case 1: {
