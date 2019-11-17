@@ -2,4 +2,3 @@
 .env
 package-lock.json
 storage/repldex.db
-npm-debug.log
