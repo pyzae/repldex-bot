@@ -55,7 +55,7 @@ async function saveDatabase() {
   });
 }*/
 
-async function wipeDatabaseFile() {
+async function () {
   console.log("Deleting database file");
   fs.unlink(config.databaseFile, (err) => {
     if (err) throw err;
@@ -126,13 +126,8 @@ module.exports.advancedRead = function(query, cb) {
   });
 };
 
-module.exports.wipeDatabase = function(online, cb) {
-  wipeDatabaseFile().then(() => {
-    if(online) wipeDatabaseOnline().then(() => {
-      loadDatabase().then(cb).catch(cb);
-    }).catch(cb);
-    else loadDatabase().then(cb).catch(cb);
-  }).catch(cb);
+module.exports.delete = function(query, cb) {
+  db.delete(query).then(_result => {cb()})
 }
 
 loadDatabase().catch(console.error);
